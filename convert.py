@@ -67,5 +67,5 @@ for entry in entries:
     if "year" in entry:
         year = entry["year"]
 
-    print("{}\t{}\t{}\t{}".format(author, title, publish, year))
+    print("{}\t{}\t{}\t{}".format(author, title, year, publish))
 
