@@ -22,7 +22,7 @@ entry = {}
 for line in stdin:
     if (match('^@', line.strip())):
         if entry != {}:
-            entries.append(entry.copy())
+            entries.append(entry)
             entry = {}
     elif (match('url', line.strip())):
         value, = findall('\{(\S+)\}', line)
