@@ -44,7 +44,7 @@ def main (bib_lines, output_file_path):
 
 	print ('Writing csv file...')
 	with open (output_file_path, 'w', encoding='utf8') as fp:
-		fp.write ("{}\t{}\t{}\t{}".format('author', 'title', 'year', 'publish'))
+		fp.write ("{}\t{}\t{}\t{}".format('author', 'title', 'year', 'publish') + '\n')
 		for entry in entries:
 			author = "Anonymous"
 			if "author" in entry:
@@ -82,7 +82,7 @@ def main (bib_lines, output_file_path):
 				year = entry["year"]
 
 			# print("{}\t{}\t{}\t{}".format(author, title, year, publish))
-			fp.write ("{}\t{}\t{}\t{}".format(author, title, year, publish))
+			fp.write ("{}\t{}\t{}\t{}".format(author, title, year, publish) + '\n')
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser (description='Converts a bib file to a csv spreadsheet')
