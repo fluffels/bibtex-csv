@@ -8,12 +8,6 @@ Input is via standard input.
 Output is via standard output.
 """
 
-"""
-Added in argparse and fixed some issues
-with the conversion process
-@author Daniel J. Finnegan
-"""
-
 import os
 import sys
 from os import getcwd
@@ -44,7 +38,7 @@ def main (bib_lines, output_file_path):
 
 	print ('Writing csv file...')
 	with open (output_file_path, 'w', encoding='utf8') as fp:
-		fp.write ("{}\t{}\t{}\t{}".format('author', 'title', 'year', 'publish') + '\n')
+		fp.write ("{}\t{}\t{}\t{}\t{}\t{}".format("author", "title", "year", "publish", "doi", "keywords") + '\n')
 		for entry in entries:
 			author = "Anonymous"
 			if "author" in entry:
@@ -81,8 +75,16 @@ def main (bib_lines, output_file_path):
 			if "year" in entry:
 				year = entry["year"]
 
+			doi = ''
+			if 'doi' in entry:
+				doi = entry['doi']
+
+			keywords = ''
+			if 'keywords' in entry:
+				keywords = entry['keywords']
+
 			# print("{}\t{}\t{}\t{}".format(author, title, year, publish))
-			fp.write ("{}\t{}\t{}\t{}".format(author, title, year, publish) + '\n')
+			fp.write ("{}\t{}\t{}\t{}\t{}\t{}".format(author, title, year, publish, doi, keywords) + '\n')
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser (description='Converts a bib file to a csv spreadsheet')
