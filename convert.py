@@ -39,7 +39,9 @@ def bib2csv (bib_lines, output_file_path):
 
 			entry['bibkey'] = curr_bibkey # Store the sentinel bibkey
 		elif (match('url', line.strip())): # Match the url
-			value, = findall('\{(\S+).*(\S+)\}', line)
+			# value, = findall('\{(\S+).*(\S+)\}', line)
+			# value = match('\{(\S+).*(\S+)\}', line)
+			value = [v.strip(" ,\n") for v in line.split("=", maxsplit=1)][1]
 			entry["url"] = value
 		elif (search('=', line.strip())): # Match everything else
 			if (search ('author', line.strip ())):
@@ -50,9 +52,14 @@ def bib2csv (bib_lines, output_file_path):
 				key, value = [v.strip(" {},\n") for v in line.split("=", maxsplit=1)]
 			entry[key] = value
 
+	## Grab the last entry that will have been missed
+	if entry != {}:
+		entries.append (entry)
+		entry = {}
+
 	print ('Writing csv file...')
 	with open (output_file_path, 'w', encoding='utf8') as fp:
-		fp.write ("{}\t{}\t{}\t{}\t{}\t{}\t{}".format("bibkey", "author", "title", "year", "publish", "doi", "keywords") + '\n')
+		fp.write ("{}<>{}<>{}<>{}<>{}<>{}<>{}<>{}".format("bibkey", "author", "title", "year", "url", "publisher", "doi", "keywords") + '\n')
 		for entry in entries:
 			bibkey = ''
 			if 'bibkey' in entry:
@@ -60,49 +67,51 @@ def bib2csv (bib_lines, output_file_path):
 
 			author = "Anonymous"
 			if "author" in entry:
-				author = entry["author"]
+				author = entry["author"].strip ('{} ')
 			elif "authors" in entry:
-				author = entry["authors"]
+				author = entry["authors"].strip ('{} ')
 			elif "editor" in entry:
-				author = entry["editor"]
+				author = entry["editor"].strip ('{} ')
 			
 			title = "No title"
 			if "title" in entry:
-				title = entry["title"]
+				title = entry["title"].strip ('{} ')
 
-			publish = "No publishing information"
+			url = 'No URL'
+			if 'url' in entry:
+				url = entry['url'].strip ('{} ')
+
+			publisher = "No publishing information"
 			if "journal" in entry:
-				publish = entry["journal"]
+				publisher = entry["journal"].strip ('{} ')
 			if "journaltitle" in entry:
-				publish = entry["journaltitle"]
+				publisher = entry["journaltitle"].strip ('{} ')
 			elif "booktitle" in entry:
-				publish = entry["booktitle"]
+				publisher = entry["booktitle"].strip ('{} ')
 			elif "howpublished" in entry:
-				publish = entry["howpublished"]
+				publisher = entry["howpublished"].strip ('{} ')
 			elif "type" in entry:
-				publish = entry["type"]
-			elif "url" in entry:
-				publish = "Website: {}".format(entry["url"])
+				publisher = entry["type"].strip ('{} ')
 			elif "crossref" in entry:
-				publish = entry["crossref"].replace("_", " ")
+				publisher = entry["crossref"].replace("_", " ").strip ('{} ')
 				publish = capwords(publish)
 			elif "publisher" in entry:
-				publish = entry["publisher"]
+				publisher = entry["publisher"].strip ('{} ')
 			
 			year = "Unknown year"
 			if "year" in entry:
-				year = entry["year"]
+				year = entry["year"].strip ('{} ')
 
 			doi = 'Unknown DOI'
 			if 'doi' in entry:
-				doi = entry['doi']
+				doi = entry['doi'].strip ('{} ')
 
 			keywords = 'No Keywords'
 			if 'keywords' in entry:
-				keywords = entry['keywords']
+				keywords = entry['keywords'].strip ('{} ')
 
 			# print("{}\t{}\t{}\t{}".format(author, title, year, publish))
-			fp.write ("{}\t{}\t{}\t{}\t{}\t{}\t{}".format(bibkey, author, title, year, publish, doi, keywords) + '\n')
+			fp.write ("{}<>{}<>{}<>{}<>{}<>{}<>{}<>{}".format(bibkey, author, title, year, url, publisher, doi, keywords) + '\n')
 
 def csv2bib (csv_lines, output_file):
 	entries = []
@@ -120,12 +129,18 @@ def csv2bib (csv_lines, output_file):
 	# """
 
 	for line in csv_lines[1:]: # Skip the csv header
-		bibkey, author, title, year, publish, doi, keywords = line.split('\t')
+		# print (line)
+		# print (line.split ('\t'))
+		# for item in line.split ('\t'):
+		# 	print (item)
+		# print ('Number of items:', len (line.split ('\t')))
+		bibkey, author, title, year, url, publisher, doi, keywords = line.split('<>')
 		entry = '' + sub ('@bibkey@', bibkey, '@article{@bibkey@,') + '\n'
-		entry = entry + sub ('@author@', author, 'author = @author@,') + '\n'
-		entry = entry + sub ('@title@', title, 'title = @title@,') + '\n'
+		entry = entry + sub ('@author@', author, 'author = {@author@},') + '\n'
+		entry = entry + sub ('@title@', title, 'title = {@title@},') + '\n'
 		entry = entry + sub ('@year@', year, 'year = {@year@},') + '\n'
-		entry = entry + sub ('@publish@', publish, 'publish = {@publish@},') + '\n'
+		entry = entry + sub ('@publisher@', publisher, 'publisher = {@publisher@},') + '\n'
+		entry = entry + sub ('@url@', url, 'url = {@url@},') + '\n'
 		entry = entry + sub ('@doi@', doi, 'doi = {@doi@},') + '\n'
 		entry = entry + sub ('@keywords@', keywords, 'keywords = {@keywords@},') + '\n'
 		entry = entry + '}' '\n'
@@ -133,6 +148,7 @@ def csv2bib (csv_lines, output_file):
 
 	print ('Writing bib file...')
 	with open (output_file_path, 'w', encoding='utf8') as fp:
+	# with open (output_file_path, 'w') as fp:
 		for line in entries:
 			fp.write (line)
 
@@ -141,7 +157,7 @@ def main (input_file_path, output_file_path, conversion_flag):
 		input_lines = fp.readlines ()
 
 	## Remove whitespace
-	input_lines = [line.strip () for line in input_lines]
+	# input_lines = [line.strip () for line in input_lines]
 
 	if conversion_flag:
 		print ('Loaded input bib file. Converting to csv...')
