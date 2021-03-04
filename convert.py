@@ -31,6 +31,8 @@ for line in stdin:
         key, value = [v.strip(" {},\n") for v in line.split("=")]
         entry[key] = value
 
+entries.append(entry)
+
 for entry in entries:
     author = "Anonymous"
     if "author" in entry:
