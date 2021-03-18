@@ -28,7 +28,7 @@ for line in stdin:
         value, = findall('\{(\S+)\}', line)
         entry["url"] = value
     elif (search('=', line.strip())):
-        key, value = [v.strip(" {},\n") for v in line.split("=")]
+        key, value = [v.strip(" {},\n") for v in line.split("=", maxsplit=1)]
         entry[key] = value
 
 entries.append(entry)
