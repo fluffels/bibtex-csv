@@ -18,15 +18,15 @@ entries = []
 entry = {}
 
 for line in stdin:
-    if (match('^@', line.strip())):
+    if match('^@', line.strip()):
         if entry != {}:
             entries.append(entry)
             entry = {}
         entry['label'] = findall('^@.+{([^,]+),?', line.strip())[0]
-    elif (match('url', line.strip())):
+    elif match('url', line.strip()):
         value = findall('[{"](\S+)[}"]', line)[0]
         entry["url"] = value
-    elif (search('=', line.strip())):
+    elif search('=', line.strip()):
         key, value = [v.strip(' {},\n"') for v in line.split("=", maxsplit=1)]
         entry[key] = value
     elif entry != {}:
