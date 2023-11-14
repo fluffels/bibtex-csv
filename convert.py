@@ -29,6 +29,11 @@ for line in stdin:
     elif (search('=', line.strip())):
         key, value = [v.strip(" {},\n") for v in line.split("=", maxsplit=1)]
         entry[key] = value
+    elif entry != {}:
+        # This line is part of the previous key
+        entry[key] += (' ' + line)
+    else:
+        print('WARNING: ignoring line', line)
 
 entries.append(entry)
 
