@@ -16,6 +16,7 @@ from string import capwords
 
 entries = []
 entry = {}
+key = None
 
 for line in stdin:
     if match('^@', line.strip()):
