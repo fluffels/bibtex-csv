@@ -8,8 +8,6 @@ Input is via standard input.
 Output is via standard output.
 """
 
-from os import getcwd
-from os import listdir
 from re import match
 from re import search
 from re import findall
@@ -18,22 +16,31 @@ from string import capwords
 
 entries = []
 entry = {}
+key = None
 
 for line in stdin:
-    if (match('^@', line.strip())):
+    if match('^@', line.strip()):
         if entry != {}:
             entries.append(entry)
             entry = {}
-    elif (match('url', line.strip())):
-        value, = findall('\{(\S+)\}', line)
+        entry['label'] = findall('^@.+{([^,]+),?', line.strip())[0]
+    elif match('url', line.strip()):
+        value = findall('[{"](\S+)[}"]', line)[0]
         entry["url"] = value
-    elif (search('=', line.strip())):
-        key, value = [v.strip(" {},\n") for v in line.split("=", maxsplit=1)]
+    elif search('=', line.strip()):
+        key, value = [v.strip(' {},\n"') for v in line.split("=", maxsplit=1)]
         entry[key] = value
+    elif entry != {}:
+        # This line is part of the previous key
+        entry[key] += (' ' + line.strip(' {},\n"'))
+    else:
+        raise ValueError('Incorrectly formatted line', line)
 
 entries.append(entry)
 
 for entry in entries:
+    for key in entry.keys():
+        entry[key] = entry[key].strip().replace('\n', ' ').replace('\t', ' ')
     author = "Anonymous"
     if "author" in entry:
         author = entry["author"]
@@ -69,5 +76,6 @@ for entry in entries:
     if "year" in entry:
         year = entry["year"]
 
-    print("{}\t{}\t{}\t{}".format(author, title, year, publish))
+    label = entry['label']
 
+    print("{}\t{}\t{}\t{}\t{}".format(author, title, year, publish, label))
