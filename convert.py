@@ -24,14 +24,14 @@ for line in stdin:
             entry = {}
         entry['label'] = findall('^@.+{([^,]+),?', line.strip())[0]
     elif (match('url', line.strip())):
-        value = findall('[\{"](\S+)[\}"]', line)[0]
+        value = findall('[{"](\S+)[}"]', line)[0]
         entry["url"] = value
     elif (search('=', line.strip())):
-        key, value = [v.strip(" {},\n") for v in line.split("=", maxsplit=1)]
+        key, value = [v.strip(' {},\n"') for v in line.split("=", maxsplit=1)]
         entry[key] = value
     elif entry != {}:
         # This line is part of the previous key
-        entry[key] += (' ' + line)
+        entry[key] += (' ' + line.strip(' {},\n"'))
     else:
         raise ValueError('Incorrectly formatted line', line)
 
