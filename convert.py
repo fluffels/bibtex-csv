@@ -33,7 +33,7 @@ for line in stdin:
         # This line is part of the previous key
         entry[key] += (' ' + line)
     else:
-        print('WARNING: ignoring line', line)
+        raise ValueError('Incorrectly formatted line', line)
 
 entries.append(entry)
 
