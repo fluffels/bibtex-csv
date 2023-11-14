@@ -22,6 +22,7 @@ for line in stdin:
         if entry != {}:
             entries.append(entry)
             entry = {}
+        entry['label'] = findall('^@.+{([^,]+),?', line.strip())[0]
     elif (match('url', line.strip())):
         value = findall('[\{"](\S+)[\}"]', line)[0]
         entry["url"] = value
@@ -32,6 +33,8 @@ for line in stdin:
 entries.append(entry)
 
 for entry in entries:
+    for key in entry.keys():
+        entry[key] = entry[key].strip().replace('\n', ' ').replace('\t', ' ')
     author = "Anonymous"
     if "author" in entry:
         author = entry["author"]
@@ -67,5 +70,6 @@ for entry in entries:
     if "year" in entry:
         year = entry["year"]
 
-    print("{}\t{}\t{}\t{}".format(author, title, year, publish))
+    label = entry['label']
 
+    print("{}\t{}\t{}\t{}\t{}".format(author, title, year, publish, label))
