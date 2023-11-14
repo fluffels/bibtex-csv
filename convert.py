@@ -8,8 +8,6 @@ Input is via standard input.
 Output is via standard output.
 """
 
-from os import getcwd
-from os import listdir
 from re import match
 from re import search
 from re import findall
